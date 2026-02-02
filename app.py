@@ -1,24 +1,7 @@
 import streamlit as st
 import re
 
-# 1. إعداد الصفحة
 st.set_page_config(page_title="GuardX - Awareness Program", page_icon="🛡️")
-
-# --- خدعة CSS مطورة لتكبير النجوم غصب عنها ---
-st.markdown("""
-    <style>
-    /* تكبير النجوم في أداة الـ feedback */
-    [data-testid="stFeedbackAdhoc"] svg {
-        width: 80px !important;
-        height: 80px !important;
-    }
-    /* تكبير المسافات بين النجوم */
-    [data-testid="stFeedbackAdhoc"] {
-        gap: 15px !important;
-        justify-content: center;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 
 # --- القائمة الجانبية ---
 st.sidebar.title("👥 Project Team")
@@ -28,17 +11,13 @@ st.sidebar.write("✨ **Nahed Hisham**")
 st.sidebar.divider()
 st.sidebar.info("This project is a collaborative effort for Cybersecurity Awareness.")
 
-# دالات التحقق
 def has_arabic(text): return bool(re.search(r'[\u0600-\u06FF]', text))
 def is_valid_email(email): return bool(re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email))
 
-# --- 2. نظام التسجيل ---
-if "show_signup" not in st.session_state: 
-    st.session_state.show_signup = False
+if "show_signup" not in st.session_state: st.session_state.show_signup = False
 
 col_title, col_login = st.columns([3, 1])
-with col_title: 
-    st.title("🛡️ GuardX Security")
+with col_title: st.title("🛡️ GuardX Security")
 with col_login:
     if st.button("🔐 Sign In / Join", use_container_width=True):
         st.session_state.show_signup = not st.session_state.show_signup
@@ -49,31 +28,26 @@ if st.session_state.show_signup:
         user_name = st.text_input("Full Name (English Only)")
         user_email = st.text_input("Email Address")
         if st.form_submit_button("Submit"):
-            if has_arabic(user_name) or has_arabic(user_email): 
-                st.error("⚠️ Error: Please use English characters only.")
-            elif not is_valid_email(user_email): 
-                st.error("⚠️ Error: Please enter a valid email.")
+            if has_arabic(user_name) or has_arabic(user_email): st.error("⚠️ English characters only.")
+            elif not is_valid_email(user_email): st.error("⚠️ Invalid email.")
             else:
                 try:
                     with open("emails.txt", "a", encoding="utf-8") as f:
                         f.write(f"Name: {user_name}, Email: {user_email}\n")
-                    st.success("✅ Registered Successfully!")
+                    st.success("✅ Registered!")
                     st.balloons()
                     st.session_state.show_signup = False
                 except: st.error("Error saving data.")
 
 st.divider()
-
-# --- 3. التابات ---
 tab1, tab2, tab3, tab4 = st.tabs(["🛡️ Strength Checker", "📚 Awareness Guide", "🎮 Workshop", "💬 Feedback"])
 
-# --- Tab 1: Strength Checker ---
 with tab1:
     st.header("Password Strength Analyzer")
     password = st.text_input("Enter Password:", type="password")
     if password:
         missing = []
-        if len(password) < 12: missing.append("Make it longer (min 12)")
+        if len(password) < 12: missing.append("Make it longer")
         if not re.search(r"[A-Z]", password): missing.append("Add Uppercase")
         if not re.search(r"\d", password): missing.append("Add Numbers")
         if not re.search(r"[!@#$%^&*]", password): missing.append("Add Special characters")
@@ -83,13 +57,11 @@ with tab1:
         else: st.success("✅ Strong!")
         if missing: st.info("\n".join([f"👉 {m}" for m in missing]))
 
-# --- Tab 2: Awareness Guide ---
 with tab2:
     st.header("📚 Security Education")
-    st.success("**Password Managers:** Remember ONE master password, let the tool handle the rest.")
-    st.warning("⚠️ **Never** reuse the same password across multiple sites.")
+    st.success("**Password Managers:** Remember ONE master password.")
+    st.warning("⚠️ **Never** reuse passwords.")
 
-# --- Tab 3: Workshop ---
 with tab3:
     st.header("🎮 Role-Playing Workshop")
     with st.expander("Scenario 1"):
@@ -98,24 +70,30 @@ with tab3:
             if "Verify" in r1: st.success("🎯 Correct!")
             else: st.error("❌ Risk!")
 
-# --- Tab 4: Feedback ---
 with tab4:
     st.header("💬 Your Feedback")
-    st.write("How would you rate your experience?")
-    
-    # النجوم الكبيرة جداً
-    star_rating = st.feedback("stars")
-    
+    st.write("### How would you rate your experience?")
+    col1, col2, col3, col4, col5 = st.columns(5)
+    if "star_rate" not in st.session_state: st.session_state.star_rate = 0
+    with col1:
+        if st.button("⭐", key="star1", use_container_width=True): st.session_state.star_rate = 1
+    with col2:
+        if st.button("⭐⭐", key="star2", use_container_width=True): st.session_state.star_rate = 2
+    with col3:
+        if st.button("⭐⭐⭐", key="star3", use_container_width=True): st.session_state.star_rate = 3
+    with col4:
+        if st.button("⭐⭐⭐⭐", key="star4", use_container_width=True): st.session_state.star_rate = 4
+    with col5:
+        if st.button("⭐⭐⭐⭐⭐", key="star5", use_container_width=True): st.session_state.star_rate = 5
+    if st.session_state.star_rate > 0:
+        st.markdown(f"<h2 style='text-align: center; color: #FFD700;'>Selected: {'⭐' * st.session_state.star_rate}</h2>", unsafe_allow_html=True)
     user_feedback = st.text_area("What did you learn or how can we improve?")
-    
-    if st.button("Submit Feedback"):
-        if user_feedback:
+    if st.button("Submit Feedback", type="primary"):
+        if user_feedback and st.session_state.star_rate > 0:
             try:
-                actual_stars = (star_rating + 1) if star_rating is not None else 0
                 with open("feedback.txt", "a", encoding="utf-8") as f:
-                    f.write(f"Rating: {actual_stars} Stars | Comment: {user_feedback}\n")
-                st.success(f"Thank you for the {actual_stars} star rating!")
-            except:
-                st.error("Error saving feedback.")
-        else:
-            st.warning("Please write a comment first.")
+                    f.write(f"Rating: {st.session_state.star_rate} Stars | Comment: {user_feedback}\n")
+                st.success(f"Thank you for the {st.session_state.star_rate} star rating!")
+                st.session_state.star_rate = 0
+            except: st.error("Error saving feedback.")
+        else: st.warning("Please select a star rating and write a comment first.")
