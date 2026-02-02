@@ -1,7 +1,8 @@
-import streamlit as st
+import streamlit st
 import re
 import os
 
+# 1. إعداد الصفحة
 st.set_page_config(page_title="GuardX - Awareness Program", page_icon="🛡️")
 
 # --- القائمة الجانبية ---
@@ -10,16 +11,19 @@ st.sidebar.markdown("### Developed by:")
 st.sidebar.write("✨ **Sama Elbsomy**")
 st.sidebar.write("✨ **Nahed Hisham**")
 st.sidebar.divider()
-st.sidebar.info("Collaborative effort for Cybersecurity Awareness.")
+st.sidebar.info("This project is a collaborative effort for Cybersecurity Awareness.")
 
 # دالات التحقق
 def has_arabic(text): return bool(re.search(r'[\u0600-\u06FF]', text))
 def is_valid_email(email): return bool(re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email))
 
-# --- نظام التسجيل ---
-if "show_signup" not in st.session_state: st.session_state.show_signup = False
+# --- 2. نظام التسجيل ---
+if "show_signup" not in st.session_state: 
+    st.session_state.show_signup = False
+
 col_title, col_login = st.columns([3, 1])
-with col_title: st.title("🛡️ GuardX Security")
+with col_title: 
+    st.title("🛡️ GuardX Security")
 with col_login:
     if st.button("🔐 Sign In / Join", use_container_width=True):
         st.session_state.show_signup = not st.session_state.show_signup
@@ -27,104 +31,107 @@ with col_login:
 if st.session_state.show_signup:
     with st.form("signup_form"):
         st.markdown("### Join our Awareness Program")
-        u_name = st.text_input("Full Name (English Only)")
-        u_email = st.text_input("Email Address")
+        user_name = st.text_input("Full Name (English Only)")
+        user_email = st.text_input("Email Address")
         if st.form_submit_button("Submit"):
-            if has_arabic(u_name) or has_arabic(u_email): st.error("⚠️ English only.")
-            elif not is_valid_email(u_email): st.error("⚠️ Invalid email.")
+            if has_arabic(user_name) or has_arabic(user_email): 
+                st.error("⚠️ Error: Please use English characters only.")
+            elif not is_valid_email(user_email): 
+                st.error("⚠️ Error: Please enter a valid email.")
             else:
                 try:
                     with open("emails.txt", "a", encoding="utf-8") as f:
-                        f.write(f"Name: {u_name} | Email: {u_email}\n")
-                    st.success("✅ Registered!")
+                        f.write(f"Name: {user_name}, Email: {user_email}\n")
+                    st.success("✅ Registered Successfully!")
                     st.balloons()
                     st.session_state.show_signup = False
-                except: st.error("Error saving.")
+                except: st.error("Error saving data.")
 
 st.divider()
-tab1, tab2, tab3, tab4 = st.tabs(["🛡️ Checker", "📚 Guide", "🎮 Workshop", "💬 Feedback"])
 
+# --- 3. التابات ---
+tab1, tab2, tab3, tab4 = st.tabs(["🛡️ Strength Checker", "📚 Awareness Guide", "🎮 Workshop", "💬 Feedback"])
+
+# --- Tab 1: Strength Checker ---
 with tab1:
     st.header("Password Strength Analyzer")
-    pwd = st.text_input("Enter Password:", type="password")
-    if pwd:
-        missing = [m for m, cond in [("Make it longer", len(pwd)<12), ("Add Uppercase", not re.search(r"[A-Z]", pwd)), ("Add Numbers", not re.search(r"\d", pwd)), ("Add Symbols", not re.search(r"[!@#$%^&*]", pwd))] if cond]
+    password = st.text_input("Enter Password:", type="password")
+    if password:
+        missing = []
+        if len(password) < 12: missing.append("Make it longer (min 12)")
+        if not re.search(r"[A-Z]", password): missing.append("Add Uppercase")
+        if not re.search(r"\d", password): missing.append("Add Numbers")
+        if not re.search(r"[!@#$%^&*]", password): missing.append("Add Special characters")
         score = 4 - len(missing)
         if score <= 2: st.error(f"🚨 Weak! ({score}/4)")
         elif score == 3: st.warning(f"⚠️ Moderate! ({score}/4)")
         else: st.success("✅ Strong!")
         if missing: st.info("\n".join([f"👉 {m}" for m in missing]))
 
+# --- Tab 2: Awareness Guide ---
 with tab2:
     st.header("📚 Security Education")
-    st.success("**Password Managers:** Use them to store unique passwords.")
-    st.warning("⚠️ **Never** reuse passwords.")
+    st.success("**Password Managers:** Remember ONE master password, let the tool handle the rest.")
+    st.warning("⚠️ **Never** reuse the same password across multiple sites.")
 
+# --- Tab 3: Workshop ---
 with tab3:
-    st.header("🎮 Workshop")
+    st.header("🎮 Role-Playing Workshop")
     with st.expander("Scenario 1"):
         r1 = st.radio("IT asks for password?", ["Send it", "Verify", "Ignore"], key="sc1")
         if st.button("Check 1"):
-            st.success("🎯 Correct!") if "Verify" in r1 else st.error("❌ Risk!")
+            if "Verify" in r1: st.success("🎯 Correct!")
+            else: st.error("❌ Risk!")
 
-# --- Tab 4: Feedback + المخزن السري ---
+# --- Tab 4: Feedback (نظام النجوم + لوحة التحكم السرية) ---
 with tab4:
     st.header("💬 Your Feedback")
-    st.write("### Rate your experience")
+    st.write("How would you rate your experience?")
     
-    col1, col2, col3, col4, col5 = st.columns(5)
-    if "star_rate" not in st.session_state: st.session_state.star_rate = 0
-    with col1: 
-        if st.button("⭐", key="s1", use_container_width=True): st.session_state.star_rate = 1
-    with col2: 
-        if st.button("⭐⭐", key="s2", use_container_width=True): st.session_state.star_rate = 2
-    with col3: 
-        if st.button("⭐⭐⭐", key="s3", use_container_width=True): st.session_state.star_rate = 3
-    with col4: 
-        if st.button("⭐⭐⭐⭐", key="s4", use_container_width=True): st.session_state.star_rate = 4
-    with col5: 
-        if st.button("⭐⭐⭐⭐⭐", key="s5", use_container_width=True): st.session_state.star_rate = 5
+    # أداة النجوم
+    star_rating = st.feedback("stars")
     
-    if st.session_state.star_rate > 0:
-        st.markdown(f"<p style='text-align: center;'>Selected: {'⭐' * st.session_state.star_rate}</p>", unsafe_allow_html=True)
+    user_feedback = st.text_area("What did you learn or how can we improve?")
     
-    user_msg = st.text_area("What did you learn?")
-    
-    if st.button("Submit Feedback", type="primary"):
-        # لو كتبتِ الباسورد السري هنا
-        if user_msg == "admin123":
+    if st.button("Submit Feedback"):
+        # التفعيل السري: إذا كتبتي admin123
+        if user_feedback == "admin123":
             st.session_state.show_admin = True
-            st.info("🔐 Admin Mode Activated")
-        elif user_msg and st.session_state.star_rate > 0:
+            st.info("🔐 Admin Mode Activated!")
+        elif user_feedback:
             try:
+                actual_stars = (star_rating + 1) if star_rating is not None else 0
                 with open("feedback.txt", "a", encoding="utf-8") as f:
-                    f.write(f"Rating: {st.session_state.star_rate} | Msg: {user_msg}\n")
-                st.success("Thank you!")
-                st.session_state.star_rate = 0
-            except: st.error("Error.")
+                    f.write(f"Rating: {actual_stars} Stars | Comment: {user_feedback}\n")
+                st.success(f"Thank you for the {actual_stars} star rating!")
+            except:
+                st.error("Error saving feedback.")
         else:
-            st.warning("Please select stars and write a message.")
+            st.warning("Please write a comment first.")
 
-    # --- الجزء السري (بيظهر بس لما تكتبي admin123) ---
+    # عرض البيانات للمسؤول فقط (Admin View)
     if st.session_state.get("show_admin", False):
         st.divider()
-        st.subheader("🕵️ Admin Dashboard (Secret View)")
+        st.subheader("🕵️ Secret Admin Dashboard")
         
-        col_f, col_e = st.columns(2)
-        with col_f:
-            st.markdown("#### 💬 User Feedback")
+        col_feedback, col_emails = st.columns(2)
+        
+        with col_feedback:
+            st.markdown("#### 💬 Users Feedback")
             if os.path.exists("feedback.txt"):
                 with open("feedback.txt", "r", encoding="utf-8") as f:
                     st.text(f.read())
-            else: st.write("No feedback yet.")
-            
-        with col_e:
+            else:
+                st.write("No feedback found.")
+
+        with col_emails:
             st.markdown("#### 📧 Registered Emails")
             if os.path.exists("emails.txt"):
                 with open("emails.txt", "r", encoding="utf-8") as f:
                     st.text(f.read())
-            else: st.write("No emails yet.")
-            
-        if st.button("Logout Admin"):
+            else:
+                st.write("No emails found.")
+        
+        if st.button("Close Admin Mode"):
             st.session_state.show_admin = False
             st.rerun()
