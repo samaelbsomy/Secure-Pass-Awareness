@@ -1,4 +1,4 @@
-import streamlit st
+import streamlit as st
 import re
 import os
 
@@ -88,13 +88,11 @@ with tab4:
     st.header("💬 Your Feedback")
     st.write("How would you rate your experience?")
     
-    # أداة النجوم
     star_rating = st.feedback("stars")
-    
     user_feedback = st.text_area("What did you learn or how can we improve?")
     
     if st.button("Submit Feedback"):
-        # التفعيل السري: إذا كتبتي admin123
+        # التفعيل السري: إذا كتبتِ admin123
         if user_feedback == "admin123":
             st.session_state.show_admin = True
             st.info("🔐 Admin Mode Activated!")
