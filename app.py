@@ -51,14 +51,15 @@ tab1, tab2, tab3 = st.tabs(["🛡️ Strength Checker", "📚 Awareness Guide", 
 with tab1:
     st.header("Password Strength Analyzer")
     
-    # علامة الاستفهام والنصيحة الأساسية
-    with st.expander("❓ How to create a strong password?"):
-        st.info("A strong password should be at least 12 characters long, include Uppercase (A-Z), Numbers (0-9), and Symbols (@#$!). Avoid using common words or personal info.")
-
-    password = st.text_input("Enter Password to Analyze:", type="password")
+    # خانة الباسورد مع علامة الاستفهام الرمادية (Help Tooltip)
+    password = st.text_input(
+        "Enter Password to Analyze:", 
+        type="password", 
+        help="A strong password should be at least 12 characters long, include Uppercase (A-Z), Numbers (0-9), and Symbols (@#$!). Avoid common words or personal info."
+    )
 
     if password:
-        # فحص النواقص بناءً على المدخلات
+        # فحص النواقص
         missing = []
         if len(password) < 12: missing.append("Make it longer (at least 12 characters)")
         if not re.search(r"[A-Z]", password): missing.append("Add Uppercase letters (A-Z)")
@@ -75,7 +76,7 @@ with tab1:
         else:
             st.success("✅ Strong Password! Your account is well-protected.")
 
-        # البوكس الأزرق اللي فيه النصائح (بيظهر فقط لو في نواقص)
+        # البوكس الأزرق للنصائح (يظهر فقط لو في نواقص)
         if missing:
             st.info("**💡 Security Tips to Improve Your Password:**\n\n" + 
                     "\n".join([f"👉 {m}" for m in missing]))
