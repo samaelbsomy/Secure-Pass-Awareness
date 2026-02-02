@@ -5,6 +5,14 @@ import math
 # 1. إعداد الصفحة
 st.set_page_config(page_title="GuardX - Awareness Program", page_icon="🛡️")
 
+# --- إضافة أسماء الفريق في القائمة الجانبية (Sidebar) ---
+st.sidebar.title("👥 Project Team")
+st.sidebar.markdown("### Developed by:")
+st.sidebar.write("✨ **Sama Elbsomy**")
+st.sidebar.write("✨ **Nahed Hisham**")
+st.sidebar.divider()
+st.sidebar.info("This project is a collaborative effort for Cybersecurity Awareness.")
+
 # دالة للتحقق من اللغة والإيميل
 def has_arabic(text): return bool(re.search(r'[\u0600-\u06FF]', text))
 def is_valid_email(email): return bool(re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email))
@@ -51,7 +59,6 @@ tab1, tab2, tab3 = st.tabs(["🛡️ Strength Checker", "📚 Awareness Guide", 
 with tab1:
     st.header("Password Strength Analyzer")
     
-    # خانة الباسورد مع علامة الاستفهام الرمادية (Help Tooltip)
     password = st.text_input(
         "Enter Password to Analyze:", 
         type="password", 
@@ -59,7 +66,6 @@ with tab1:
     )
 
     if password:
-        # فحص النواقص
         missing = []
         if len(password) < 12: missing.append("Make it longer (at least 12 characters)")
         if not re.search(r"[A-Z]", password): missing.append("Add Uppercase letters (A-Z)")
@@ -68,7 +74,6 @@ with tab1:
 
         score = 4 - len(missing)
         
-        # إظهار حالة الباسورد (الإنذار)
         if score <= 2:
             st.error(f"🚨 Weak Password! (Security Score: {score}/4)")
         elif score == 3:
@@ -76,7 +81,6 @@ with tab1:
         else:
             st.success("✅ Strong Password! Your account is well-protected.")
 
-        # البوكس الأزرق للنصائح (يظهر فقط لو في نواقص)
         if missing:
             st.info("**💡 Security Tips to Improve Your Password:**\n\n" + 
                     "\n".join([f"👉 {m}" for m in missing]))
@@ -97,7 +101,6 @@ with tab2:
     * 🚀 **Auto-Fill:** It fills in your login details instantly and safely.
     """)
 
-    # تحذير المثلث الأصفر
     st.warning("⚠️ **CRITICAL ADVICE:** Never reuse the same password for different accounts! If one account is hacked, attackers can use it to enter your Bank, Email, and Social Media.")
 
     col1, col2, col3 = st.columns(3)
@@ -112,7 +115,6 @@ with tab3:
     st.header("🎭 Hands-on Workshop")
     st.write("Test your reactions to common Social Engineering attacks:")
 
-    # Scenario 1
     with st.expander("Scenario 1: The IT Impersonator"):
         st.write("You get an email from 'System Admin' asking for your login details to fix a server error.")
         r1 = st.radio("What would you do?", 
@@ -123,7 +125,6 @@ with tab3:
             if "official" in r1: st.success("🎯 Correct! Verification is your strongest shield.")
             else: st.error("❌ Dangerous! Real IT staff will never ask for your password.")
 
-    # Scenario 2
     with st.expander("Scenario 2: The Urgent Account Alert"):
         st.write("A message says: 'Urgent! Your account will be deleted in 30 minutes. Click here to verify now!'.")
         r2 = st.radio("What would you do?", 
@@ -134,7 +135,6 @@ with tab3:
             if "official website" in r2: st.success("🎯 Correct! Urgency is a trick used in Phishing.")
             else: st.error("❌ Dangerous! Phishing links lead to fake login pages.")
 
-    # Scenario 3
     with st.expander("Scenario 3: The Lost USB Drive"):
         st.write("You find a USB drive in the office kitchen with a label 'Private Bonuses'.")
         r3 = st.radio("What would you do?", 
@@ -144,4 +144,3 @@ with tab3:
         if st.button("Submit Answer 3"):
             if "Security" in r3: st.success("🎯 Correct! This is 'Baiting'. The drive could contain malware.")
             else: st.error("❌ Dangerous! Unknown USBs can compromise your entire network.")
-
