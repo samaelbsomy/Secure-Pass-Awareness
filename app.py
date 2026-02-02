@@ -4,6 +4,21 @@ import re
 # 1. إعداد الصفحة
 st.set_page_config(page_title="GuardX - Awareness Program", page_icon="🛡️")
 
+# --- خدعة تكبير النجوم باستخدام CSS ---
+st.markdown("""
+    <style>
+    /* تكبير حجم النجوم */
+    button[data-baseweb="button"] div {
+        font-size: 30px !important; 
+    }
+    /* تحسين شكل النجوم في الـ feedback */
+    [data-testid="stFeedbackAdhoc"] svg {
+        width: 45px;
+        height: 45px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 # --- القائمة الجانبية ---
 st.sidebar.title("👥 Project Team")
 st.sidebar.markdown("### Developed by:")
@@ -82,13 +97,12 @@ with tab3:
             if "Verify" in r1: st.success("🎯 Correct!")
             else: st.error("❌ Risk!")
 
-# --- Tab 4: Feedback (نظام النجوم الحقيقي المطور) ---
+# --- Tab 4: Feedback (النجوم الكبيرة) ---
 with tab4:
     st.header("💬 Your Feedback")
     st.write("How would you rate your experience?")
     
-    # استخدام أداة النجوم الحقيقية من Streamlit
-    # النجوم دي بتنور لما تدوسي عليها وشكلها "Clean" جداً
+    # النجوم هتظهر كبيرة بفضل الـ CSS اللي فوق
     star_rating = st.feedback("stars")
     
     user_feedback = st.text_area("What did you learn or how can we improve?")
@@ -96,7 +110,6 @@ with tab4:
     if st.button("Submit Feedback"):
         if user_feedback:
             try:
-                # تحويل التقييم لرقم نجوم (0-4 بتتحول لـ 1-5)
                 actual_stars = (star_rating + 1) if star_rating is not None else 0
                 with open("feedback.txt", "a", encoding="utf-8") as f:
                     f.write(f"Rating: {actual_stars} Stars | Comment: {user_feedback}\n")
@@ -105,4 +118,3 @@ with tab4:
                 st.error("Error saving feedback.")
         else:
             st.warning("Please write a comment first.")
-
