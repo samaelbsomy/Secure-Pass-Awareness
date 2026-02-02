@@ -4,17 +4,18 @@ import re
 # 1. إعداد الصفحة
 st.set_page_config(page_title="GuardX - Awareness Program", page_icon="🛡️")
 
-# --- خدعة تكبير النجوم باستخدام CSS ---
+# --- خدعة CSS مطورة لتكبير النجوم غصب عنها ---
 st.markdown("""
     <style>
-    /* تكبير حجم النجوم */
-    button[data-baseweb="button"] div {
-        font-size: 30px !important; 
-    }
-    /* تحسين شكل النجوم في الـ feedback */
+    /* تكبير النجوم في أداة الـ feedback */
     [data-testid="stFeedbackAdhoc"] svg {
-        width: 45px;
-        height: 45px;
+        width: 80px !important;
+        height: 80px !important;
+    }
+    /* تكبير المسافات بين النجوم */
+    [data-testid="stFeedbackAdhoc"] {
+        gap: 15px !important;
+        justify-content: center;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -97,12 +98,12 @@ with tab3:
             if "Verify" in r1: st.success("🎯 Correct!")
             else: st.error("❌ Risk!")
 
-# --- Tab 4: Feedback (النجوم الكبيرة) ---
+# --- Tab 4: Feedback ---
 with tab4:
     st.header("💬 Your Feedback")
     st.write("How would you rate your experience?")
     
-    # النجوم هتظهر كبيرة بفضل الـ CSS اللي فوق
+    # النجوم الكبيرة جداً
     star_rating = st.feedback("stars")
     
     user_feedback = st.text_area("What did you learn or how can we improve?")
