@@ -1,6 +1,5 @@
 import streamlit as st
 import re
-import math
 
 # 1. إعداد الصفحة
 st.set_page_config(page_title="GuardX - Awareness Program", page_icon="🛡️")
@@ -13,7 +12,7 @@ st.sidebar.write("✨ **Nahed Hisham**")
 st.sidebar.divider()
 st.sidebar.info("This project is a collaborative effort for Cybersecurity Awareness.")
 
-# دالة للتحقق من اللغة والإيميل
+# دالات التحقق
 def has_arabic(text): return bool(re.search(r'[\u0600-\u06FF]', text))
 def is_valid_email(email): return bool(re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email))
 
@@ -32,7 +31,6 @@ if st.session_state.show_signup:
     with st.container():
         with st.form("signup_form"):
             st.markdown("### Join our Awareness Program")
-            st.write("Get security tips and reminders every 3 months.")
             user_name = st.text_input("Full Name (English Only)")
             user_email = st.text_input("Email Address")
             if st.form_submit_button("Submit"):
@@ -44,7 +42,7 @@ if st.session_state.show_signup:
                     try:
                         with open("emails.txt", "a", encoding="utf-8") as f:
                             f.write(f"Name: {user_name}, Email: {user_email}\n")
-                        st.success("✅ Success! You are now protected in our 90-day cycle.")
+                        st.success("✅ Success! You are now registered.")
                         st.balloons()
                         st.session_state.show_signup = False
                     except:
@@ -52,17 +50,16 @@ if st.session_state.show_signup:
 
 st.divider()
 
-# --- 3. التابات الأساسية ---
-tab1, tab2, tab3 = st.tabs(["🛡️ Strength Checker", "📚 Awareness Guide", "🎮 Role-Playing Workshop"])
+# --- 3. التابات الأساسية (إضافة تاب الفيدباك) ---
+tab1, tab2, tab3, tab4 = st.tabs(["🛡️ Strength Checker", "📚 Awareness Guide", "🎮 Workshop", "💬 Feedback"])
 
 # --- Tab 1: Strength Checker ---
 with tab1:
     st.header("Password Strength Analyzer")
-    
     password = st.text_input(
         "Enter Password to Analyze:", 
         type="password", 
-        help="A strong password should be at least 12 characters long, include Uppercase (A-Z), Numbers (0-9), and Symbols (@#$!). Avoid common words or personal info."
+        help="A strong password should be at least 12 characters long, include Uppercase (A-Z), Numbers (0-9), and Symbols (@#$!)."
     )
 
     if password:
@@ -71,76 +68,54 @@ with tab1:
         if not re.search(r"[A-Z]", password): missing.append("Add Uppercase letters (A-Z)")
         if not re.search(r"\d", password): missing.append("Add Numbers (0-9)")
         if not re.search(r"[!@#$%^&*]", password): missing.append("Add Special characters (!@#$)")
-
         score = 4 - len(missing)
         
-        if score <= 2:
-            st.error(f"🚨 Weak Password! (Security Score: {score}/4)")
-        elif score == 3:
-            st.warning(f"⚠️ Moderate Password! (Security Score: {score}/4)")
-        else:
-            st.success("✅ Strong Password! Your account is well-protected.")
+        if score <= 2: st.error(f"🚨 Weak Password! (Score: {score}/4)")
+        elif score == 3: st.warning(f"⚠️ Moderate Password! (Score: {score}/4)")
+        else: st.success("✅ Strong Password!")
 
         if missing:
-            st.info("**💡 Security Tips to Improve Your Password:**\n\n" + 
-                    "\n".join([f"👉 {m}" for m in missing]))
+            st.info("**💡 Security Tips:**\n\n" + "\n".join([f"👉 {m}" for m in missing]))
 
 # --- Tab 2: Awareness Guide ---
 with tab2:
     st.header("📚 Security Education")
     st.subheader("The Power of Password Managers")
-    st.write("""
-    A **Password Manager** is a secure digital vault that stores all your passwords. 
-    It means you don't have to use weak, easy-to-guess passwords or write them on paper.
-    """)
-    
-    st.success("""
-    **Why you need a Password Manager:**
-    * 🛡️ **No More Forgetting:** You only remember ONE master password.
-    * 🔒 **Unique Passwords:** It creates a different, complex password for every site.
-    * 🚀 **Auto-Fill:** It fills in your login details instantly and safely.
-    """)
+    st.write("A Password Manager is a secure digital vault for all your passwords.")
+    st.success("**Why use it?**\n* 🛡️ Generates strong passwords.\n* 🧠 You only remember ONE master password.")
+    st.warning("⚠️ **CRITICAL:** Never reuse the same password! One hack can compromise everything.")
 
-    st.warning("⚠️ **CRITICAL ADVICE:** Never reuse the same password for different accounts! If one account is hacked, attackers can use it to enter your Bank, Email, and Social Media.")
-
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Security", "Maximum")
-    col2.metric("Convenience", "100%")
-    col3.metric("Risk Level", "Very Low")
-    
-    st.info("🚀 **Recommended Tools:** Bitwarden (Free), 1Password, or Dashlane.")
-
-# --- Tab 3: Workshop (Scenarios) ---
+# --- Tab 3: Workshop ---
 with tab3:
-    st.header("🎭 Hands-on Workshop")
-    st.write("Test your reactions to common Social Engineering attacks:")
-
+    st.header("🎮 Role-Playing Workshop")
     with st.expander("Scenario 1: The IT Impersonator"):
-        st.write("You get an email from 'System Admin' asking for your login details to fix a server error.")
-        r1 = st.radio("What would you do?", 
-                     ["Send the details quickly to avoid system downtime.", 
-                      "Ignore the email and call the official IT helpdesk to verify.", 
-                      "Reply asking for proof that they are actually from IT."], key="sc1")
-        if st.button("Submit Answer 1"):
-            if "official" in r1: st.success("🎯 Correct! Verification is your strongest shield.")
-            else: st.error("❌ Dangerous! Real IT staff will never ask for your password.")
+        r1 = st.radio("IT asks for your password. What do you do?", ["Send it", "Verify via official helpdesk", "Ignore"], key="sc1")
+        if st.button("Check Answer 1"):
+            if "Verify" in r1: st.success("🎯 Correct!")
+            else: st.error("❌ Risk!")
 
-    with st.expander("Scenario 2: The Urgent Account Alert"):
-        st.write("A message says: 'Urgent! Your account will be deleted in 30 minutes. Click here to verify now!'.")
-        r2 = st.radio("What would you do?", 
-                     ["Click the link immediately to prevent losing my data.", 
-                      "Go to the service's official website directly in a new tab.", 
-                      "Call the phone number provided in the urgent message."], key="sc2")
-        if st.button("Submit Answer 2"):
-            if "official website" in r2: st.success("🎯 Correct! Urgency is a trick used in Phishing.")
-            else: st.error("❌ Dangerous! Phishing links lead to fake login pages.")
+    with st.expander("Scenario 2: Lost USB"):
+        r3 = st.radio("Found a USB labeled 'Private'. What do you do?", ["Plug it in", "Hand to Security", "Keep it"], key="sc3")
+        if st.button("Check Answer 2"):
+            if "Security" in r3: st.success("🎯 Correct!")
+            else: st.error("❌ Dangerous!")
 
-    with st.expander("Scenario 3: The Lost USB Drive"):
-        st.write("You find a USB drive in the office kitchen with a label 'Private Bonuses'.")
-        r3 = st.radio("What would you do?", 
-                     ["Plug it in privately to see whose bonuses are inside.", 
-                      "Throw it in the trash so no one else picks it up.", 
-                      "Hand it over to the Security or IT department immediately."], key="sc3")
-        if st.button("Submit Answer 3"):
-            if "Security" in r3: st.success("🎯 Correct! This is 'Baiting'. The drive could contain malware.")
-            else: st.error("❌ Dangerous! Unknown USBs can compromise your entire network.")
+# --- Tab 4: Feedback (الجزء الجديد) ---
+with tab4:
+    st.header("💬 Your Feedback")
+    st.write("We value your opinion! Tell us how we can improve GuardX.")
+    
+    with st.form("feedback_form"):
+        rating = st.slider("Rate the website (1 = Poor, 5 = Excellent)", 1, 5, 5)
+        user_feedback = st.text_area("What did you learn or what should we add?")
+        
+        if st.form_submit_button("Submit Feedback"):
+            if user_feedback:
+                try:
+                    with open("feedback.txt", "a", encoding="utf-8") as f:
+                        f.write(f"Rating: {rating}, Comment: {user_feedback}\n")
+                    st.success("Thank you! Your feedback has been saved.")
+                except:
+                    st.error("Error saving feedback.")
+            else:
+                st.warning("Please write something before submitting.")
