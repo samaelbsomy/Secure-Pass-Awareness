@@ -64,4 +64,78 @@ with tab1:
         if len(password) < 12: missing.append("Make it longer (at least 12 characters)")
         if not re.search(r"[A-Z]", password): missing.append("Add Uppercase letters (A-Z)")
         if not re.search(r"\d", password): missing.append("Add Numbers (0-9)")
-        if not re.
+        if not re.search(r"[!@#$%^&*]", password): missing.append("Add Special characters (!@#$)")
+        
+        score = 4 - len(missing)
+        if score <= 2:
+            st.error(f"🚨 Weak Password! (Score: {score}/4)")
+        elif score == 3:
+            st.warning(f"⚠️ Moderate Password! (Score: {score}/4)")
+        else:
+            st.success("✅ Strong Password! You are well protected.")
+
+        if missing:
+            st.info("**💡 Security Tips:**\n\n" + "\n".join([f"👉 {m}" for m in missing]))
+
+# --- Tab 2: Awareness Guide ---
+with tab2:
+    st.header("📚 Security Education")
+    st.subheader("The Power of Password Managers")
+    st.write("A Password Manager is a secure digital vault that stores all your passwords safely.")
+    st.success("""
+    **Why you need it:**
+    * 🛡️ **No More Forgetting:** Only remember ONE master password.
+    * 🔒 **Unique Passwords:** Different, complex password for every site.
+    """)
+    st.warning("⚠️ **CRITICAL:** Never reuse the same password! If one site is hacked, all your accounts are at risk.")
+
+# --- Tab 3: Workshop (Scenarios) ---
+with tab3:
+    st.header("🎮 Role-Playing Workshop")
+    
+    with st.expander("Scenario 1: The IT Impersonator"):
+        st.write("Someone from 'IT' asks for your password to fix an issue.")
+        r1 = st.radio("What would you do?", ["Send it", "Verify via official helpdesk", "Ignore"], key="sc1")
+        if st.button("Submit 1"):
+            if "Verify" in r1: st.success("🎯 Correct! Real IT staff never ask for passwords.")
+            else: st.error("❌ Dangerous! This is a social engineering attack.")
+
+    with st.expander("Scenario 2: Urgent Email"):
+        st.write("'Your account is locked. Click here to verify!'.")
+        r2 = st.radio("Action?", ["Click link", "Go to official site", "Call number"], key="sc2")
+        if st.button("Submit 2"):
+            if "official" in r2: st.success("🎯 Correct! Always go to the source directly.")
+            else: st.error("❌ Risk! This is likely a phishing attempt.")
+
+    with st.expander("Scenario 3: Found USB"):
+        st.write("You find a USB drive in the office kitchen.")
+        r3 = st.radio("Action?", ["Plug it in", "Hand to Security", "Ignore"], key="sc3")
+        if st.button("Submit 3"):
+            if "Security" in r3: st.success("🎯 Correct! Unknown USBs can contain malware.")
+            else: st.error("❌ Risk! This is called 'Baiting'.")
+
+# --- Tab 4: Feedback (نظام النجوم الأفقي) ---
+with tab4:
+    st.header("💬 Your Feedback")
+    st.write("We value your opinion! Rate your experience with GuardX:")
+    
+    with st.form("feedback_form"):
+        stars = st.radio(
+            "Select Rating:",
+            options=["⭐", "⭐⭐", "⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐⭐⭐"],
+            index=4,
+            horizontal=True
+        )
+        user_feedback = st.text_area("Tell us what you learned or how we can improve:")
+        
+        if st.form_submit_button("Submit Feedback"):
+            if user_feedback:
+                try:
+                    with open("feedback.txt", "a", encoding="utf-8") as f:
+                        f.write(f"Rating: {stars} | Comment: {user_feedback}\n")
+                    st.success(f"Thank you for the {stars} rating! Your feedback is saved.")
+                except:
+                    st.error("Error saving feedback.")
+            else:
+                st.warning("Please write a comment before submitting.")
+
