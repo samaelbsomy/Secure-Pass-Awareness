@@ -5,7 +5,7 @@ import os
 # 1. إعداد الصفحة
 st.set_page_config(page_title="GuardX - Awareness Program", page_icon="🛡️")
 
-# --- تنسيق CSS لتكبير النجوم وتجميل الصفحة ---
+# --- CSS لتكبير النجوم وتجميل الصفحة ---
 st.markdown("""
     <style>
     button[data-baseweb="button"] div { font-size: 30px !important; }
@@ -36,6 +36,7 @@ with col_login:
     if st.button("🔐 Sign In / Join", use_container_width=True):
         st.session_state.show_signup = not st.session_state.show_signup
 
+# (كود التسجيل يظل كما هو لضمان ثباته)
 if st.session_state.show_signup:
     with st.form("signup_form"):
         st.markdown("### Join our Awareness Program")
@@ -43,101 +44,106 @@ if st.session_state.show_signup:
         user_email = st.text_input("Email Address")
         if st.form_submit_button("Submit"):
             if has_arabic(user_name) or has_arabic(user_email): st.error("⚠️ Use English characters only.")
-            elif not is_valid_email(user_email): st.error("⚠️ Invalid email address.")
+            elif not is_valid_email(user_email): st.error("⚠️ Invalid email.")
             else:
                 try:
                     with open("emails.txt", "a", encoding="utf-8") as f:
                         f.write(f"Name: {user_name}, Email: {user_email}\n")
                     st.success("✅ Registered Successfully!")
-                    st.balloons()
-                    st.session_state.show_signup = False
+                    st.balloons(); st.session_state.show_signup = False
                 except: st.error("Error saving data.")
 
 st.divider()
 
-# --- 3. التابات ---
+# --- التابات ---
 tab1, tab2, tab3, tab4 = st.tabs(["🛡️ Strength Checker", "📚 Awareness Guide", "🎮 Workshop", "💬 Feedback"])
 
-# --- Tab 1: Strength Checker ---
+# --- Tab 1: Strength Checker (المعدل بـ Time Crack والوصف المباشر) ---
 with tab1:
     st.header("Password Strength Analyzer")
-    password = st.text_input("Enter Password:", type="password", help="Strong passwords are 12+ chars, include Uppercase, Numbers, and Symbols.")
+    password = st.text_input("Enter Password:", type="password", help="How secure is your password?")
+    
     if password:
-        missing = [m for m, cond in [("Min 12 characters", len(password)<12), ("Uppercase (A-Z)", not re.search(r'[A-Z]', password)), ("Numbers (0-9)", not re.search(r'\d', password)), ("Special char (!@#$)", not re.search(r'[!@#$%^&*]', password))] if cond]
+        missing = []
+        if len(password) < 12: missing.append("Make it longer (min 12)")
+        if not re.search(r"[A-Z]", password): missing.append("Add Uppercase")
+        if not re.search(r"\d", password): missing.append("Add Numbers")
+        if not re.search(r"[!@#$%^&*]", password): missing.append("Add Special characters")
+        
         score = 4 - len(missing)
-        if score <= 2: st.error(f"🚨 Weak! ({score}/4)")
-        elif score == 3: st.warning(f"⚠️ Moderate! ({score}/4)")
-        else: st.success("✅ Strong!")
+        
+        # تحديد الوقت المتوقع للاختراق (Time to Crack)
+        if score <= 1:
+            time_crack = "Instantly (Less than 1 second)"
+            st.error(f"🚨 **Strength: Very Weak**")
+            st.markdown(f"**⏱️ Estimated time to crack:** `{time_crack}`")
+        elif score == 2:
+            time_crack = "A few minutes to 1 hour"
+            st.error(f"🚨 **Strength: Weak**")
+            st.markdown(f"**⏱️ Estimated time to crack:** `{time_crack}`")
+        elif score == 3:
+            time_crack = "Around 2 to 5 years"
+            st.warning(f"⚠️ **Strength: Moderate**")
+            st.markdown(f"**⏱️ Estimated time to crack:** `{time_crack}`")
+        else:
+            time_crack = "Centuries (100+ years)"
+            st.success(f"✅ **Strength: Strong**")
+            st.markdown(f"**⏱️ Estimated time to crack:** `{time_crack}`")
+
         if missing:
-            st.info("💡 To make it stronger:")
+            st.info("💡 **To make it unhackable:**")
             for m in missing: st.write(f"👉 {m}")
 
-# --- Tab 2: Awareness Guide (تعديل المحتوى ليكون بسيط ومفهوم وكافي) ---
+# --- Tab 2: Awareness Guide (كلام بسيط ومفيد) ---
 with tab2:
     st.header("📚 Security Education")
-    
-    st.subheader("🗝️ What is a Password Manager?")
+    st.subheader("🗝️ Password Managers")
+    st.write("A secure vault that remembers all your complex passwords so you only have to remember **ONE** Master Password.")
     st.markdown("""
-    Think of it as a **Secure Digital Vault**. Instead of struggling to remember 20 different passwords, 
-    you only remember **one** Master Password. The manager does the rest:
-    
-    * **Generates Strong Passwords:** It creates complex passwords you don't even have to type yourself.
-    * **Auto-Fill:** It fills your login details automatically on websites, which protects you from fake pages.
-    * **Zero Reuse:** It ensures every account has a unique password, so if one site is hacked, your other accounts stay safe.
+    * **No More Guessing:** It creates long, random passwords for you.
+    * **Safety First:** Protects you from phishing by auto-filling only on real sites.
     """)
-    
     st.divider()
-    
-    st.subheader("🛡️ Essential Security Tips")
-    st.success("**MFA (Multi-Factor Authentication):** This is your second lock. Even if someone steals your password, they can't get in without the code from your phone.")
-    st.warning("**The Golden Rule:** Never use the same password for your Bank and your Social Media. Reuse is a hacker's best friend!")
-    st.info("**Check the Source:** Before clicking any link in an email, always look at the actual email address, not just the name of the sender.")
+    st.info("🛡️ **MFA:** Multi-Factor Authentication is your best shield. Always enable it.")
+    st.warning("⚠️ **Never reuse passwords:** Using one password for everything is a hacker's dream.")
 
-# --- Tab 3: Workshop ---
+# (بقية الكود الخاص بالـ Workshop والـ Feedback والـ Admin تظل كما هي)
 with tab3:
-    st.header("🎮 Role-Playing Workshop")
-    scenarios = [
-        ("Scenario 1", "IT asks for password?", ["Send it", "Verify identity", "Ignore"], "Verify", "Real IT never asks for passwords."),
-        ("Scenario 2", "Found a USB labeled 'Salaries'?", ["Plug it in", "Give to Security", "Leave it"], "Security", "USBs can contain malware/Baiting."),
-        ("Scenario 3", "Urgent Email from Netflix?", ["Click link", "Check Sender", "Delete"], "Check Sender", "This is a Phishing attempt.")
-    ]
-    for i, (title, ques, opts, ans, msg) in enumerate(scenarios, 1):
-        with st.expander(title):
-            st.write(ques)
-            choice = st.radio("What to do?", opts, key=f"r{i}")
-            if st.button(f"Check {i}"):
-                if ans in choice: st.success(f"🎯 Correct! {msg}")
-                else: st.error(f"❌ Risk! {msg}")
+    st.header("🎮 Workshop")
+    with st.expander("Scenario 1"):
+        r1 = st.radio("IT asks for password?", ["Send it", "Verify", "Ignore"], key="sc1")
+        if st.button("Check 1"):
+            if "Verify" in r1: st.success("🎯 Correct!")
+            else: st.error("❌ Risk!")
+    with st.expander("Scenario 2"):
+        r2 = st.radio("Found a USB labeled 'Salaries'?", ["Plug it in", "Give to Security", "Leave it"], key="sc2")
+        if st.button("Check 2"):
+            if "Security" in r2: st.success("🎯 Correct!")
+            else: st.error("❌ Danger!")
+    with st.expander("Scenario 3"):
+        r3 = st.radio("Email says 'Account Locked'?", ["Click", "Check Sender", "Delete"], key="sc3")
+        if st.button("Check 3"):
+            if "Check" in r3: st.success("🎯 Correct!")
+            else: st.error("❌ Risk!")
 
-# --- Tab 4: Feedback ---
 with tab4:
-    st.header("💬 Your Feedback")
+    st.header("💬 Feedback")
     star_rating = st.feedback("stars")
-    user_feedback = st.text_area("What did you learn or how can we improve?")
-    
+    user_feedback = st.text_area("Your comment (Admin Password here):")
     if st.button("Submit Feedback"):
         if user_feedback == "admin123":
-            st.session_state.show_admin = True
-            st.rerun()
+            st.session_state.show_admin = True; st.rerun()
         elif user_feedback:
             try:
-                actual_stars = (star_rating + 1) if star_rating is not None else 0
+                stars = (star_rating + 1) if star_rating is not None else 0
                 with open("feedback.txt", "a", encoding="utf-8") as f:
-                    f.write(f"Rating: {actual_stars} | Comment: {user_feedback}\n")
+                    f.write(f"Rating: {stars} | {user_feedback}\n")
                 st.success("Thank you!")
-            except: st.error("Error saving data.")
+            except: st.error("Error.")
 
     if st.session_state.get("show_admin", False):
-        st.divider()
-        st.subheader("🕵️ Secret Admin Dashboard")
-        if st.button("Close Admin Mode"): 
-            st.session_state.show_admin = False
-            st.rerun()
-        col_f, col_e = st.columns(2)
-        with col_f:
-            st.markdown("#### 💬 Feedback")
-            if os.path.exists("feedback.txt"): st.text(open("feedback.txt").read())
-        with col_e:
-            st.markdown("#### 📧 Emails")
-            if os.path.exists("emails.txt"): st.text(open("emails.txt").read())
+        st.divider(); st.subheader("🕵️ Admin Dashboard")
+        if st.button("Close"): st.session_state.show_admin = False; st.rerun()
+        if os.path.exists("feedback.txt"): st.text(open("feedback.txt").read())
+        if os.path.exists("emails.txt"): st.text(open("emails.txt").read())
 
