@@ -1,25 +1,19 @@
 import streamlit as st
 import re
+import os
 
 # 1. إعداد الصفحة
 st.set_page_config(page_title="GuardX - Awareness Program", page_icon="🛡️")
 
-# --- خدعة تكبير النجوم باستخدام CSS ---
+# --- CSS لتكبير النجوم وتجميل الصفحة ---
 st.markdown("""
     <style>
-    /* تكبير حجم النجوم */
-    button[data-baseweb="button"] div {
-        font-size: 30px !important; 
-    }
-    /* تحسين شكل النجوم في الـ feedback */
-    [data-testid="stFeedbackAdhoc"] svg {
-        width: 45px;
-        height: 45px;
-    }
+    button[data-baseweb="button"] div { font-size: 30px !important; }
+    [data-testid="stFeedbackAdhoc"] svg { width: 45px; height: 45px; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- القائمة الجانبية ---
+# --- القائمة الجانبية (Sidebar) ---
 st.sidebar.title("👥 Project Team")
 st.sidebar.markdown("### Developed by:")
 st.sidebar.write("✨ **Sama Elbsomy**")
@@ -32,11 +26,11 @@ def has_arabic(text): return bool(re.search(r'[\u0600-\u06FF]', text))
 def is_valid_email(email): return bool(re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email))
 
 # --- 2. نظام التسجيل ---
-if "show_signup" not in st.session_state: 
+if "show_signup" not in st.session_state:
     st.session_state.show_signup = False
 
 col_title, col_login = st.columns([3, 1])
-with col_title: 
+with col_title:
     st.title("🛡️ GuardX Security")
 with col_login:
     if st.button("🔐 Sign In / Join", use_container_width=True):
@@ -48,9 +42,9 @@ if st.session_state.show_signup:
         user_name = st.text_input("Full Name (English Only)")
         user_email = st.text_input("Email Address")
         if st.form_submit_button("Submit"):
-            if has_arabic(user_name) or has_arabic(user_email): 
+            if has_arabic(user_name) or has_arabic(user_email):
                 st.error("⚠️ Error: Please use English characters only.")
-            elif not is_valid_email(user_email): 
+            elif not is_valid_email(user_email):
                 st.error("⚠️ Error: Please enter a valid email.")
             else:
                 try:
@@ -63,59 +57,102 @@ if st.session_state.show_signup:
 
 st.divider()
 
-# --- 3. التابات ---
+# --- 3. التابات (Tabs) ---
 tab1, tab2, tab3, tab4 = st.tabs(["🛡️ Strength Checker", "📚 Awareness Guide", "🎮 Workshop", "💬 Feedback"])
 
 # --- Tab 1: Strength Checker ---
 with tab1:
     st.header("Password Strength Analyzer")
-    password = st.text_input("Enter Password:", type="password")
+    # علامة الاستفهام الرمادية مضافة هنا (help)
+    password = st.text_input(
+        "Enter Password:", 
+        type="password", 
+        help="A strong password should be at least 12 characters long and include numbers, uppercase letters, and symbols."
+    )
     if password:
         missing = []
         if len(password) < 12: missing.append("Make it longer (min 12)")
         if not re.search(r"[A-Z]", password): missing.append("Add Uppercase")
         if not re.search(r"\d", password): missing.append("Add Numbers")
         if not re.search(r"[!@#$%^&*]", password): missing.append("Add Special characters")
+        
         score = 4 - len(missing)
         if score <= 2: st.error(f"🚨 Weak! ({score}/4)")
         elif score == 3: st.warning(f"⚠️ Moderate! ({score}/4)")
         else: st.success("✅ Strong!")
-        if missing: st.info("\n".join([f"👉 {m}" for m in missing]))
+        
+        if missing:
+            st.info("💡 To make it stronger:")
+            for m in missing:
+                st.write(f"👉 {m}")
 
 # --- Tab 2: Awareness Guide ---
 with tab2:
     st.header("📚 Security Education")
     st.success("**Password Managers:** Remember ONE master password, let the tool handle the rest.")
+    st.info("🛡️ **MFA:** Multi-Factor Authentication is your best shield.")
     st.warning("⚠️ **Never** reuse the same password across multiple sites.")
 
-# --- Tab 3: Workshop ---
+# --- Tab 3: Workshop (3 السيناريوهات الكاملة) ---
 with tab3:
     st.header("🎮 Role-Playing Workshop")
-    with st.expander("Scenario 1"):
-        r1 = st.radio("IT asks for password?", ["Send it", "Verify", "Ignore"], key="sc1")
+    
+    with st.expander("Scenario 1: IT Support Request"):
+        st.write("Someone calling themselves 'IT Support' asks for your password to fix an issue.")
+        r1 = st.radio("What do you do?", ["Send it", "Verify their identity", "Ignore"], key="sc1")
         if st.button("Check 1"):
-            if "Verify" in r1: st.success("🎯 Correct!")
-            else: st.error("❌ Risk!")
+            if "Verify" in r1: st.success("🎯 Correct! Never share passwords.")
+            else: st.error("❌ Risk! Real IT will never ask for your password.")
 
-# --- Tab 4: Feedback (النجوم الكبيرة) ---
+    with st.expander("Scenario 2: The Found USB"):
+        st.write("You find a USB drive in the parking lot labeled 'Salary List'.")
+        r2 = st.radio("What do you do?", ["Plug it in", "Give it to IT security", "Leave it"], key="sc2")
+        if st.button("Check 2"):
+            if "security" in r2.lower(): st.success("🎯 Correct! USBs can contain malware.")
+            else: st.error("❌ Danger! This is a common 'Baiting' attack.")
+
+    with st.expander("Scenario 3: Urgent Email"):
+        st.write("An email from 'Netflix' says your payment failed, click the link to update.")
+        r3 = st.radio("What do you do?", ["Click the link", "Check sender's email address", "Delete it"], key="sc3")
+        if st.button("Check 3"):
+            if "Check" in r3: st.success("🎯 Correct! Always check the sender's actual address.")
+            else: st.error("❌ Risk! This is a Phishing attempt.")
+
+# --- Tab 4: Feedback ---
 with tab4:
     st.header("💬 Your Feedback")
     st.write("How would you rate your experience?")
-    
-    # النجوم هتظهر كبيرة بفضل الـ CSS اللي فوق
     star_rating = st.feedback("stars")
-    
-    user_feedback = st.text_area("What did you learn or how can we improve?")
+    user_feedback = st.text_area("What did you learn or how can we improve? (Admin: admin123)")
     
     if st.button("Submit Feedback"):
-        if user_feedback:
+        if user_feedback == "admin123":
+            st.session_state.show_admin = True
+            st.rerun()
+        elif user_feedback:
             try:
                 actual_stars = (star_rating + 1) if star_rating is not None else 0
                 with open("feedback.txt", "a", encoding="utf-8") as f:
                     f.write(f"Rating: {actual_stars} Stars | Comment: {user_feedback}\n")
                 st.success(f"Thank you for the {actual_stars} star rating!")
-            except:
-                st.error("Error saving feedback.")
-        else:
-            st.warning("Please write a comment first.")
+            except: st.error("Error saving feedback.")
+        else: st.warning("Please write a comment first.")
 
+    # لوحة التحكم السرية
+    if st.session_state.get("show_admin", False):
+        st.divider()
+        st.subheader("🕵️ Secret Admin Dashboard")
+        col_feedback, col_emails = st.columns(2)
+        with col_feedback:
+            st.markdown("#### 💬 Users Feedback")
+            if os.path.exists("feedback.txt"):
+                st.text(open("feedback.txt", "r").read())
+            else: st.write("No feedback found.")
+        with col_emails:
+            st.markdown("#### 📧 Registered Emails")
+            if os.path.exists("emails.txt"):
+                st.text(open("emails.txt", "r").read())
+            else: st.write("No emails found.")
+        if st.button("Close Admin Mode"):
+            st.session_state.show_admin = False
+            st.rerun()
