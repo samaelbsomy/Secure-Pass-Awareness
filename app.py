@@ -124,7 +124,7 @@ with tab2:
     st.info("🛡️ **MFA:** Multi-Factor Authentication is your best shield. Always enable it.")
     st.warning("⚠️ **Never reuse passwords:** Using one password for everything is a hacker's dream.")
 
-# --- Tab 3: Interactive Workshop (Scenarios) ---
+# --- Tab 3: Interactive Workshop ---
 with tab3:
     st.header("🎮 Role-Playing Workshop")
     with st.expander("Scenario 1"):
@@ -168,5 +168,4 @@ with tab4:
         st.markdown("#### Recent Feedback:")
         if os.path.exists("feedback.txt"): st.text(open("feedback.txt").read())
         st.markdown("#### Registered Users:")
-        if os.path.exists("emails.txt"): st.text(open("emails.txt").read())read())
-
+        if os.path.exists("emails.txt"): st.text(open("emails.txt").read())
