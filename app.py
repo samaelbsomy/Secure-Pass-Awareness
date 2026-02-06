@@ -55,7 +55,6 @@ if st.session_state.show_signup:
                 st.error("⚠️ Invalid email format.")
             else:
                 try:
-                    # Save user data to a local text file
                     with open("emails.txt", "a", encoding="utf-8") as f:
                         f.write(f"Name: {user_name}, Email: {user_email}\n")
                     st.success("✅ Registered Successfully!")
@@ -72,7 +71,6 @@ tab1, tab2, tab3, tab4 = st.tabs(["🛡️ Strength Checker", "📚 Awareness Gu
 # --- Tab 1: Password Strength Analyzer ---
 with tab1:
     st.header("Password Strength Analyzer")
-    # Help tooltip explains the requirements for a strong password
     password = st.text_input(
         "Enter Password:", 
         type="password", 
@@ -88,7 +86,6 @@ with tab1:
         
         score = 4 - len(missing)
         
-        # Determine Strength Level and Time to Crack
         if score <= 1:
             time_crack = "Instantly (Less than 1 second)"
             st.error(f"🚨 **Strength: Very Weak**")
@@ -118,6 +115,10 @@ with tab2:
     st.markdown("""
     * **No More Guessing:** It creates long, random passwords for you.
     * **Safety First:** Protects you from phishing by auto-filling only on real sites.
+    * **Popular Examples:**
+        * 🛡️ **Bitwarden** (Free & Open Source)
+        * 🔑 **1Password** (Highly Secure)
+        * 💨 **Dashlane** (User Friendly)
     """)
     st.divider()
     st.info("🛡️ **MFA:** Multi-Factor Authentication is your best shield. Always enable it.")
@@ -146,9 +147,8 @@ with tab3:
 with tab4:
     st.header("💬 User Feedback")
     star_rating = st.feedback("stars")
-    user_feedback = st.text_area("Your comment (Enter Admin Password here to unlock dashboard):")
+    user_feedback = st.text_area("Your comment:")
     if st.button("Submit Feedback"):
-        # Secret bypass to enter Admin Mode
         if user_feedback == "admin123":
             st.session_state.show_admin = True; st.rerun()
         elif user_feedback:
@@ -160,14 +160,13 @@ with tab4:
             except: 
                 st.error("Error saving feedback.")
 
-    # --- Admin Dashboard (Conditional Visibility) ---
     if st.session_state.get("show_admin", False):
         st.divider(); st.subheader("🕵️ Secret Admin Dashboard")
         if st.button("Close Admin Mode"): 
             st.session_state.show_admin = False; st.rerun()
         
-        # Display stored Feedback and Emails
         st.markdown("#### Recent Feedback:")
         if os.path.exists("feedback.txt"): st.text(open("feedback.txt").read())
         st.markdown("#### Registered Users:")
-        if os.path.exists("emails.txt"): st.text(open("emails.txt").read())
+        if os.path.exists("emails.txt"): st.text(open("emails.txt").read())read())
+
