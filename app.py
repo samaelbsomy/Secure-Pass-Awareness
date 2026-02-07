@@ -33,7 +33,6 @@ def is_valid_email(email):
 
 # --- 5. Session State Initialization ---
 if "show_signup" not in st.session_state: st.session_state.show_signup = False
-if "show_admin" not in st.session_state: st.session_state.show_admin = False
 
 # --- 6. Header & Login Toggle ---
 col_title, col_login = st.columns([3, 1])
@@ -143,15 +142,13 @@ with tab3:
             if "Check" in r3: st.success("🎯 Correct! Always verify the sender's real email.")
             else: st.error("❌ Risk! Clicking suspicious links leads to account theft.")
 
-# --- Tab 4: User Feedback & Admin Gateway ---
+# --- Tab 4: User Feedback ---
 with tab4:
     st.header("💬 User Feedback")
     star_rating = st.feedback("stars")
     user_feedback = st.text_area("Your comment:")
     if st.button("Submit Feedback"):
-        if user_feedback == "admin123":
-            st.session_state.show_admin = True; st.rerun()
-        elif user_feedback:
+        if user_feedback:
             try:
                 stars = (star_rating + 1) if star_rating is not None else 0
                 with open("feedback.txt", "a", encoding="utf-8") as f:
@@ -160,12 +157,3 @@ with tab4:
             except: 
                 st.error("Error saving feedback.")
 
-    if st.session_state.get("show_admin", False):
-        st.divider(); st.subheader("🕵️ Secret Admin Dashboard")
-        if st.button("Close Admin Mode"): 
-            st.session_state.show_admin = False; st.rerun()
-        
-        st.markdown("#### Recent Feedback:")
-        if os.path.exists("feedback.txt"): st.text(open("feedback.txt").read())
-        st.markdown("#### Registered Users:")
-        if os.path.exists("emails.txt"): st.text(open("emails.txt").read())
